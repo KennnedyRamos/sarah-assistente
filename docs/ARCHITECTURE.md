@@ -62,14 +62,14 @@ O modelo é configurável (`JARVIS_MODEL`). Modelos de nuvem do Ollama (`*cloud*
  │ memória, aprovações  │               │  ├─ agent.py  laço do agente + ferramentas│
  └──────────────────────┘               │  ├─ llm.py ──HTTP──► Ollama :11434 (Vulkan)│
                                         │  ├─ db.py     SQLite (data/jarvis.db)    │
-                                        │  ├─ tools/    ferramentas tipadas         │
-                                        │  └─ voice/    Whisper (CPU), Kokoro (CPU) │
+                                        │  ├─ tools.py  ferramentas tipadas         │
+                                        │  └─ voice.py  Whisper (CPU), Kokoro (CPU) │
                                         └──────────────────────────────────────────┘
 ```
 
 | Componente | Responsabilidade | Tecnologia |
 |---|---|---|
-| `web/` | Interface responsiva pt-BR, tema escuro, sem build | HTML + CSS + JS puro |
+| `web/` | Interface responsiva pt-BR, sem build | HTML + CSS + JS puro |
 | `jarvis/main.py` | Rotas HTTP, WebSocket de chat, arquivos estáticos | FastAPI + Uvicorn |
 | `jarvis/auth.py` | Senha (scrypt da stdlib), sessões com expiração, checagem de Host/Origin contra DNS rebinding/CSRF, limite de tentativas | stdlib |
 | `jarvis/agent.py` | Prompt de sistema, injeção de memórias, laço de chamada de ferramentas, streaming | — |
@@ -83,7 +83,7 @@ O modelo é configurável (`JARVIS_MODEL`). Modelos de nuvem do Ollama (`*cloud*
 | `jarvis/secure.py` | Cifragem DPAPI compartilhada (token do Google, dados faciais) | ctypes |
 | `jarvis/google_api.py` | Gmail e Agenda via REST com OAuth do usuário; token cifrado com DPAPI | google-auth-oauthlib (só o login) |
 | `jarvis/remote.py` | Lê o estado do Tailscale e do `serve`; libera o nome `*.ts.net` como Host | CLI do Tailscale |
-| `jarvis/tools.py` | 15 ferramentas tipadas, com níveis leitura/ação/perigosa, validação, tempo limite, pastas e apps autorizados (`data/permissoes.json`), modos simulação/normal/somente leitura | stdlib + ctypes (Lixeira do Windows) |
+| `jarvis/tools.py` | Registro das ferramentas tipadas (44 no total, somando as de programação, e-mail, agenda, web, câmera e localização), com níveis leitura/ação/perigosa, validação, tempo limite, pastas e apps autorizados (`data/permissoes.json`), modos simulação/normal/somente leitura | stdlib + ctypes (Lixeira do Windows) |
 | `jarvis/voice.py` | STT e TTS na CPU, modelos em `data/models` | faster-whisper (CTranslate2 int8), kokoro-onnx (int8) |
 | `jarvis/listener.py` | Escuta local opcional: palmas (numpy) e o nome "Sarah" (trechos curtos de fala → Whisper `base`) | sounddevice (PortAudio), faster-whisper |
 | `jarvis/icon.py` | Logotipo: imagem → ícones da página/celular e `.ico` do atalho | OpenCV |

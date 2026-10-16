@@ -622,7 +622,7 @@ def google_status(session=Depends(auth.require_session)):
 async def google_connect(session=Depends(auth.require_session)):
     local_only(session, "A conexão com o Google abre o navegador do PC: faça no próprio PC.")
     if not google_api.status()["configured"]:
-        raise HTTPException(409, "Falta o client_secret.json em data/google. Veja INTEGRATIONS.md.")
+        raise HTTPException(409, "Falta o client_secret.json em data/google. Veja docs/INTEGRATIONS.md.")
 
     def run():
         try:
@@ -655,7 +655,7 @@ def face_status(session=Depends(auth.require_session)):
 
 def _camera_allowed(session) -> None:
     if not face.enabled():
-        raise HTTPException(409, "Reconhecimento facial desativado. Veja INTEGRATIONS.md para ativar.")
+        raise HTTPException(409, "Reconhecimento facial desativado. Veja docs/INTEGRATIONS.md para ativar.")
     try:
         face.camera_allowed(bool(session["remote"]))
     except face.FaceError as e:

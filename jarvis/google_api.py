@@ -1,4 +1,4 @@
-"""Integração com Gmail e Google Agenda usando o OAuth do próprio usuário (passo a passo em INTEGRATIONS.md).
+"""Integração com Gmail e Google Agenda usando o OAuth do próprio usuário (passo a passo em docs/INTEGRATIONS.md).
 
 - O usuário cria o próprio projeto no Google Cloud e coloca o client_secret.json em data/google/.
 - O login acontece no navegador do PC; o Jarvis nunca vê a senha do Google.
@@ -136,7 +136,7 @@ def connect() -> str:
     from google_auth_oauthlib.flow import InstalledAppFlow
     secret = _secret_file()
     if not secret:
-        raise IntegrationError(f"Falta o client_secret.json em {folder()}. Siga o passo a passo em INTEGRATIONS.md.")
+        raise IntegrationError(f"Falta o client_secret.json em {folder()}. Siga o passo a passo em docs/INTEGRATIONS.md.")
     global _pending
     # sem bloquear novas tentativas: se o Google barrar o login (ex.: conta fora dos "Test users"), ele não volta
     # para o app e a tentativa antiga só expira depois de 5 min; a nova roda em outra porta

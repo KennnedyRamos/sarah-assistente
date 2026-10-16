@@ -596,7 +596,7 @@ async function loadFace() {
     ? (f.can_use_camera ? "Ativo. A câmera só abre quando você pede; fotos só são salvas com \"Tirar foto\". O reconhecimento é só informativo: uma foto pode enganar, então não serve como senha."
       : "Ativo, mas a câmera do PC pelo celular está desligada (JARVIS_REMOTE_CAMERA no .env).")
     : f.feature_on ? "Ativado no .env, mas faltam os modelos: rode .venv\\Scripts\\python.exe -m jarvis.face e reinicie."
-    : "Desativado (padrão). Para ativar: JARVIS_FACE=on no .env, baixe os modelos (python -m jarvis.face) e reinicie. Detalhes em INTEGRATIONS.md.";
+    : "Desativado (padrão). Para ativar: JARVIS_FACE=on no .env, baixe os modelos (python -m jarvis.face) e reinicie. Detalhes em docs/INTEGRATIONS.md.";
   $("#face-controls").hidden = !f.enabled;
   $("#face-enroll").disabled = $("#face-identify").disabled = $("#face-photo").disabled = !f.can_use_camera;
   showFacePeople(f.people);
@@ -665,7 +665,7 @@ async function loadGoogle() {
     : g.connected && g.needs_reconnect ? `Conectada: ${g.email || "(conta)"}. Há permissões novas (ex.: ver a lista de agendas): clique em Reconectar.`
     : g.connected ? `Conectada: ${g.email || "(conta)"}. Lê e busca e-mails, baixa anexos, cria rascunhos e vê agendas; enviar e criar, alterar ou apagar eventos pede confirmação.`
     : g.error ? g.error
-    : !g.configured ? "Não configurada. Crie o projeto no Google Cloud e coloque o client_secret.json em data\\google (passo a passo em INTEGRATIONS.md)."
+    : !g.configured ? "Não configurada. Crie o projeto no Google Cloud e coloque o client_secret.json em data\\google (passo a passo em docs/INTEGRATIONS.md)."
     : "Pronta para conectar.";
   $("#google-connect").hidden = (g.connected && !g.needs_reconnect) || !g.configured || !g.can_connect;
   $("#google-connect").textContent = g.connecting ? "Abrir login de novo" : g.connected ? "Reconectar" : "Conectar conta Google";

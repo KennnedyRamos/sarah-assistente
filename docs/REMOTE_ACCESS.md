@@ -25,7 +25,7 @@ Celular (app Tailscale, sua conta) ──WireGuard criptografado──► PC: ta
 ## Uso no dia a dia
 1. No PC: `iniciar.bat`. A janela mostra `[Jarvis] Pelo celular (Tailscale): https://...`.
 2. No celular: app Tailscale **conectado** → abra o endereço no navegador → senha do Jarvis.
-   Ou instale o app **Sarah** (`Sarah.apk`, ver README → "App Android"): abre direto, sem navegador.
+   Ou instale o app **Sarah** (`Sarah.apk`, ver [MANUAL.md → App Android](MANUAL.md#app-android-sem-navegador)): abre direto, sem navegador.
    O app é só uma janela para o endereço da tailnet: não abre portas, não fala com outros servidores e não funciona sem o Tailscale.
 3. O microfone funciona no celular porque o endereço é HTTPS. Na primeira vez, o navegador pede permissão.
 
