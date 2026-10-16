@@ -1,9 +1,9 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  # shortcut: só manual enquanto o GitHub Actions da conta está bloqueado por cobrança;
+  # quando liberar, volte para "push: branches: [main]" e "pull_request:"
+  workflow_dispatch:
 
 permissions:
   contents: read

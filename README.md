@@ -9,7 +9,7 @@
 [![Ollama](https://img.shields.io/badge/Ollama-LLM_local-000000?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.com/)
 [![Flutter](https://img.shields.io/badge/Flutter-Android-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
 [![WebGL](https://img.shields.io/badge/WebGL_2-990000?style=for-the-badge&logo=webgl&logoColor=white)](https://www.khronos.org/webgl/)
-[![CI](https://img.shields.io/github/actions/workflow/status/KennnedyRamos/sarah-assistente/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=testes)](https://github.com/KennnedyRamos/sarah-assistente/actions/workflows/ci.yml)
+[![Testes](https://img.shields.io/badge/testes-260_passando-2EA44F?style=for-the-badge&logo=pytest&logoColor=white)](docs/TESTING.md)
 [![Ruff](https://img.shields.io/badge/lint-ruff-D7FF64?style=for-the-badge&logo=ruff&logoColor=black)](pyproject.toml)
 
 <img src="docs/img/inicio-pc.webp" alt="Tela inicial da Sarah no PC: rosto animado, status e caixa de mensagem" width="100%" />
@@ -115,7 +115,7 @@ Modelo de ameaça completo, com o teste que cobre cada item: [SECURITY.md](docs/
 .venv\Scripts\python.exe -m ruff check .     # lint (regras em pyproject.toml)
 ```
 
-- **Integração contínua:** cada push roda o lint e todos os testes no [GitHub Actions](https://github.com/KennnedyRamos/sarah-assistente/actions/workflows/ci.yml), num Windows limpo, sem GPU e sem o modelo.
+- **Integração contínua:** workflow do GitHub Actions em [`ci.yml`](.github/workflows/ci.yml) roda o lint e todos os testes num Windows limpo, sem GPU e sem o modelo, com as actions fixadas por commit.
 - **Unidade e integração:** autenticação, sessões, CSRF, rate limit, permissões e caminhos de cada ferramenta, agente com o modelo simulado, voz, escuta, visão, Google com a API simulada, SSRF, armazenamento e modo mãos livres.
 - **Ponta a ponta com o modelo real:** escolha da ferramenta certa (10/10 em pedidos diretos), correção de projetos com bug pelo agente de programação, latência medida e navegador headless no PC e no celular. Cada execução está registrada em [TESTING.md](docs/TESTING.md), incluindo os bugs que os testes pegaram.
 - **Testes visuais:** o rosto expõe um `hold()` para fixar poses e fotografá-las de forma determinística.
