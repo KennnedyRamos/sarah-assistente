@@ -1,0 +1,24 @@
+# Dados locais: banco, logs, sessões, modelos de voz, tokens OAuth
+data/
+.env
+*.db
+*.db-wal
+*.db-shm
+*.pid
+*.log
+# Segredos de integrações
+credentials*.json
+token*.json
+client_secret*.json
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Backups gerados por python -m jarvis.backup
+backups/
+.ruff_cache/
+
+# APK gerado do app Android (android_app)
+*.apk

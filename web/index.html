@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f8fe">
+  <title>Sarah</title>
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+  <script src="avatar.js" defer></script>
+</head>
+<body>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="pub-banner" class="pub-banner" role="status" hidden>
+    <video id="pub-preview" muted playsinline aria-label="Prévia do que está sendo transmitido"></video>
+    <span>🔴 Sua câmera está sendo transmitida para a Sarah</span>
+    <button id="pub-flip">Trocar câmera</button>
+    <button id="pub-stop" class="danger">Parar</button>
+  </div>
+
+  <!-- Login -->
+  <main id="login-view" class="login" hidden>
+    <form id="login-form" class="glass login-card">
+      <div class="login-avatar" data-avatar></div>
+      <h1 class="wordmark">SARAH</h1>
+      <p class="subtitle">Assistente de IA</p>
+      <label for="password">Senha</label>
+      <input id="password" type="password" autocomplete="current-password" required maxlength="200">
+      <button type="submit" class="primary">Entrar</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </main>
+
+  <!-- Aplicação -->
+  <div id="app-view" class="app" hidden>
+    <header class="topbar">
+      <button id="history-btn" class="icon-btn" aria-label="Histórico de conversas" aria-controls="sidebar" title="Histórico de conversas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg>
+      </button>
+      <button id="back-btn" class="icon-btn" aria-label="Voltar para a conversa" title="Voltar" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <h2 id="page-title" class="page-title"></h2>
+      <button id="menu-btn" class="icon-btn menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu" title="Menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span id="conn-dot" class="dot" aria-hidden="true"></span>
+      </button>
+      <nav id="menu" class="menu glass" aria-label="Menu" hidden>
+        <button data-action="new">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nova conversa</button>
+        <button data-action="history">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Conversas anteriores</button>
+        <button data-view="memory">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Memória</button>
+        <button data-view="voice">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>Voz</button>
+        <button data-view="tools">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6a4 4 0 0 0 5 5l-9 9-3-3 9-9a4 4 0 0 1-2-2z"/></svg>Ferramentas</button>
+        <button data-view="security">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/></svg>Segurança</button>
+        <button id="speak-toggle" aria-pressed="false">
+          <svg class="on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>
+          <svg class="off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM16 9l5 6M21 9l-5 6"/></svg>
+          <span id="speak-label">Respostas faladas</span></button>
+        <div class="status" aria-live="polite">
+          <span id="conn-status" class="pill">Conectando…</span>
+          <span id="model-status" class="pill">Modelo: ?</span>
+          <span id="wake-status" class="pill warn" hidden>Escuta local ativa</span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Início: rosto da Sarah + conversa. Sem mensagens, o rosto ocupa a tela; com mensagens, vai para o topo. -->
+    <section id="view-chat" class="view chat-view">
+      <!-- Histórico: fixo à esquerda no PC (recolhível), gaveta no celular -->
+      <aside id="sidebar" class="sidebar" aria-label="Histórico de conversas">
+        <div class="sidebar-head"><strong>Conversas</strong><button id="close-sidebar" class="icon-btn" aria-label="Fechar">✕</button></div>
+        <button id="new-chat" class="primary wide">+ Nova conversa</button>
+        <label for="conv-search" class="sr-only">Buscar conversa</label>
+        <input id="conv-search" type="search" placeholder="Buscar conversa…" maxlength="100" autocomplete="off">
+        <ul id="conv-list" class="conv-list"></ul>
+      </aside>
+      <div class="main-col">
+      <div class="stage">
+        <div class="titles"><h1 class="wordmark">SARAH</h1><p class="subtitle">Assistente de IA</p></div>
+        <button id="avatar-btn" class="avatar-btn" data-avatar aria-label="Falar com a Sarah"></button>
+        <div class="voice-status">
+          <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          <p id="avatar-caption" class="caption" aria-live="polite">Pronta para ajudar</p>
+        </div>
+      </div>
+      <div class="chat">
+        <div id="tasks-panel" class="tasks-panel" aria-live="polite" hidden></div>
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <form id="composer" class="composer">
+          <div id="attach-chip" class="attach-chip" hidden>
+            <span id="attach-name"></span><button id="attach-clear" type="button" class="icon-btn" aria-label="Remover arquivo">✕</button>
+          </div>
+          <div class="composer-row glass">
+            <button id="attach-btn" type="button" class="round ghost" aria-label="Enviar arquivo" title="Enviar arquivo">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11l-8 8a5 5 0 0 1-7-7l8-8a3.5 3.5 0 0 1 5 5l-8 8a2 2 0 0 1-3-3l7-7"/></svg>
+            </button>
+            <input id="file-input" type="file" hidden>
+            <button id="code-btn" type="button" class="round ghost" aria-pressed="false" title="Modo programação: a Sarah trabalha em projetos numa cópia isolada">&lt;/&gt;</button>
+            <label for="input" class="sr-only">Mensagem</label>
+            <textarea id="input" rows="1" maxlength="8000" placeholder="Digite uma mensagem…"></textarea>
+            <button id="send-btn" type="submit" class="round primary" aria-label="Enviar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"/></svg>
+            </button>
+            <button id="stop-btn" type="button" class="round danger" aria-label="Parar" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z"/></svg>
+            </button>
+          </div>
+          <button id="mic-btn" type="button" class="voice-btn" aria-pressed="false" aria-label="Falar (clique de novo para parar)" title="Conversa por voz">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </button>
+        </form>
+      </div>
+      </div>
+    </section>
+
+    <!-- Memória -->
+    <section id="view-memory" class="view page" hidden>
+      <div class="panel">
+        <h2>Memória</h2>
+        <p class="hint">A Sarah usa estas anotações como contexto nas conversas. Nada aqui treina o modelo. Edite ou apague quando quiser.</p>
+        <form id="memory-form" class="row">
+          <label for="memory-input" class="sr-only">Nova memória</label>
+          <input id="memory-input" maxlength="2000" placeholder="Ex.: Prefiro respostas curtas." required>
+          <button type="submit" class="primary">Adicionar</button>
+        </form>
+        <ul id="memory-list" class="item-list"></ul>
+      </div>
+    </section>
+
+    <!-- Voz -->
+    <section id="view-voice" class="view page" hidden>
+      <div class="panel">
+        <h2>Voz</h2>
+        <p id="voice-status" class="hint">Verificando modelos…</p>
+        <p class="hint">O áudio do microfone só é capturado enquanto o botão do microfone está ativo, é transcrito no seu PC e descartado. Nada é gravado em disco.</p>
+        <div class="form-grid">
+          <label for="pref-speak">Falar as respostas</label>
+          <input id="pref-speak" type="checkbox">
+          <label for="pref-voice">Voz</label>
+          <select id="pref-voice"></select>
+          <label for="pref-speed">Velocidade <output id="speed-out"></output></label>
+          <input id="pref-speed" type="range" min="0.7" max="1.5" step="0.05">
+          <label for="pref-mic">Microfone</label>
+          <select id="pref-mic"><option value="">Padrão do sistema</option></select>
+          <label for="pref-out">Saída de áudio</label>
+          <select id="pref-out"><option value="">Padrão do sistema</option></select>
+          <label for="pref-silence">Sensibilidade do microfone</label>
+          <input id="pref-silence" type="range" min="0.005" max="0.08" step="0.005">
+          <span class="hint span2">Mais à esquerda: capta voz baixa, mas ruído pode impedir a parada automática. Mais à direita: precisa falar mais alto.</span>
+          <label for="mic-level">Nível do microfone</label>
+          <meter id="mic-level" min="0" max="1" value="0"></meter>
+        </div>
+        <div class="row">
+          <button id="test-voice">Testar voz</button>
+          <button id="test-mic">Testar microfone (3 s)</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Ativação sem as mãos (no PC)</h2>
+        <p class="hint">Usa o microfone do PC enquanto ligada. O áudio é analisado em memória e descartado. Quando detecta,
+          esta página (aberta no PC) começa a ouvir sua pergunta. Diga só <strong>"Sarah"</strong> e espere o bipe, ou fale tudo de uma vez:
+          <strong>"Sarah, que horas são?"</strong>. Frases longas e o nome no meio da frase não acionam.</p>
+        <div class="form-grid">
+          <label for="wake-mode">Escuta local</label>
+          <select id="wake-mode">
+            <option value="off">Desligada</option>
+            <option value="palavra">Nome "Sarah"</option>
+            <option value="palmas">Duas palmas</option>
+            <option value="ambos">"Sarah" ou palmas</option>
+          </select>
+          <label for="wake-device" class="wake-local">Microfone da escuta</label>
+          <select id="wake-device" class="wake-local"><option value="">Padrão do Windows</option></select>
+        </div>
+        <p id="wake-note" class="hint"></p>
+        <div class="form-grid wake-local">
+          <label for="autostart">Iniciar com o Windows, sem janela</label>
+          <input id="autostart" type="checkbox">
+        </div>
+        <p class="hint wake-local">Com a escuta ligada, a Sarah fica disponível o tempo todo: sem nenhuma página aberta no PC, ela
+          ouve a pergunta depois do "Sarah", responde pelas caixas de som e a conversa aparece no histórico. Confirmações de
+          ações aparecem no celular. Para encerrar: <code>parar.bat</code>.</p>
+        <div class="wake-local">
+          <p class="hint">Palmas não reconhecidas? Clique em <strong>Calibrar palmas</strong>, espere 1 s, bata <strong>duas palmas</strong>,
+            espere 2 s e bata <strong>mais duas</strong> (12 s ao todo). O áudio fica só na memória.</p>
+          <div class="row">
+            <button id="clap-calibrate">Calibrar palmas</button>
+            <button id="clap-apply" class="primary" hidden>Aplicar ajuste</button>
+          </div>
+          <p id="clap-result" class="hint" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ferramentas -->
+    <section id="view-tools" class="view page" hidden>
+      <div class="panel">
+        <h2>Ferramentas</h2>
+        <p class="hint">A Sarah só usa as ferramentas abaixo, só nas pastas e apps autorizados. Não existe execução de comando livre.</p>
+        <div class="form-grid">
+          <label for="tools-mode">Ações perigosas</label>
+          <select id="tools-mode">
+            <option value="simulacao">Simulação: só descreve, nunca executa</option>
+            <option value="normal">Normal: executa após sua confirmação</option>
+            <option value="somente_leitura">Somente leitura: bloqueia tudo que altera algo</option>
+          </select>
+        </div>
+        <p id="tools-note" class="hint"></p>
+      </div>
+      <div class="panel">
+        <h2>Pastas autorizadas</h2>
+        <p class="hint">A Sarah só lista, cria, move ou apaga (com confirmação) dentro destas pastas. Liberar só pode ser feito aqui no PC.
+          Discos inteiros, pastas do Windows e o AppData nunca são liberados.</p>
+        <ul id="folder-list" class="item-list"></ul>
+        <div id="folder-suggest" class="chips"></div>
+        <form id="folder-form" class="row">
+          <label for="folder-input" class="sr-only">Caminho da pasta</label>
+          <input id="folder-input" maxlength="500" placeholder="C:\Users\voce\Projetos" required>
+          <button type="submit" class="primary">Liberar pasta</button>
+        </form>
+        <div id="tools-perms" class="perms"></div>
+      </div>
+      <div class="panel">
+        <h2>Lista de ferramentas</h2>
+        <ul id="tools-list" class="item-list"></ul>
+      </div>
+      <div class="panel">
+        <h2>Integrações</h2>
+        <ul class="item-list"><li>
+          <div class="grow"><strong>Google (Gmail e Agenda)</strong><small id="google-status">Verificando…</small></div>
+          <button id="google-connect" class="primary" hidden>Conectar conta Google</button>
+          <button id="google-disconnect" class="danger" hidden>Desconectar</button>
+        </li></ul>
+      </div>
+      <div class="panel">
+        <h2>Câmeras ao vivo</h2>
+        <p class="hint">Veja a câmera do PC pelo celular, ou a do celular pelo PC (a página da Sarah precisa estar aberta e na tela do celular). Desliga sozinha em 10 minutos.</p>
+        <div class="row">
+          <button id="cam-pc" class="primary">📹 Ver câmera do PC</button>
+          <button id="cam-phone">📱 Ver câmera do celular</button>
+          <button id="cam-self">Transmitir a câmera deste aparelho</button>
+        </div>
+        <div id="cam-view"></div>
+      </div>
+      <div class="panel">
+        <h2>Reconhecimento facial (opcional)</h2>
+        <p id="face-status" class="hint">Verificando…</p>
+        <div id="face-controls" hidden>
+          <ul id="face-people" class="item-list"></ul>
+          <div class="row">
+            <label for="face-name" class="sr-only">Nome da pessoa</label>
+            <input id="face-name" maxlength="60" placeholder="Nome de quem vai cadastrar o rosto">
+            <button id="face-enroll" class="primary">Cadastrar rosto</button>
+          </div>
+          <div class="row">
+            <button id="face-photo" class="primary">📷 Tirar foto agora</button>
+            <button id="face-identify">Quem está na câmera?</button>
+            <button id="face-wipe" class="danger">Apagar todos os dados faciais</button>
+          </div>
+          <p id="face-result" class="hint" aria-live="polite"></p>
+        </div>
+        <h3>Fotos salvas</h3>
+        <div id="photo-list" class="photos"></div>
+        <div class="row"><button id="photos-wipe" class="danger" hidden>Apagar todas as fotos</button></div>
+      </div>
+    </section>
+
+    <!-- Segurança -->
+    <section id="view-security" class="view page" hidden>
+      <div class="panel">
+        <h2>Acesso remoto</h2>
+        <p id="remote-status" class="hint">Verificando…</p>
+      </div>
+      <div class="panel">
+        <h2>Sessões ativas</h2>
+        <ul id="session-list" class="item-list"></ul>
+        <div class="row">
+          <button id="revoke-btn">Encerrar outras sessões</button>
+          <button id="logout-btn">Sair</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Armazenamento</h2>
+        <p class="hint">Conversas e memórias ocupam pouquíssimo. O que cresce com o tempo são as áreas do agente de programação
+          (cópias de projetos) e os backups de arquivos alterados; a limpeza abaixo nunca apaga conversas, memórias,
+          arquivos enviados, anexos ou fotos.</p>
+        <ul id="storage-list" class="item-list"></ul>
+        <p id="storage-note" class="hint"></p>
+        <div class="row">
+          <button id="clean-areas">Apagar áreas de programação sem uso</button>
+          <button id="clean-backups">Apagar backups antigos</button>
+          <button id="clean-compact">Compactar o banco</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Dados</h2>
+        <div class="row"><button id="wipe-history" class="danger">Apagar todo o histórico de conversas</button></div>
+      </div>
+      <div class="panel">
+        <h2>Auditoria</h2>
+        <p class="hint">Últimos 200 eventos (logins, exclusões, ações).</p>
+        <ul id="audit-list" class="item-list mono"></ul>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

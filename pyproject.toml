@@ -1,0 +1,23 @@
+# Configuração das ferramentas de qualidade. Rodar:
+#   .venv\Scripts\python.exe -m ruff check .
+#   .venv\Scripts\python.exe -m pytest -q
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+
+[tool.ruff.lint]
+# erros reais (pyflakes), armadilhas comuns (bugbear), modernização, asyncio e regras do próprio ruff
+select = ["F", "E9", "PLE", "B", "UP", "ASYNC", "RUF"]
+ignore = [
+    "B008",      # Depends(...) como valor padrão é o padrão do FastAPI
+    "RUF001", "RUF002", "RUF003",  # textos em português com travessão e aspas tipográficas
+    "RUF005",    # [a] + lista é mais legível aqui
+    "ASYNC109",  # ferramentas recebem tempo limite como parâmetro de propósito
+    "ASYNC240",  # leituras rápidas de disco dentro de ferramentas assíncronas
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["RUF059", "RUF012"]  # nos testes, desempacotar e descartar parte do resultado é comum
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
